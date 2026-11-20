@@ -8,3 +8,8 @@
           fi
           echo "Project directory: $PROJECT_DIR"
           gradle -p "$PROJECT_DIR" assembleDebug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SAS4-Demo-APK
+          path: project/**/app/build/outputs/apk/debug/*.apk
