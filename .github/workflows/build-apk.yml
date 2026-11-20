@@ -1,40 +1,10 @@
-
-name: Build Android APK
-
-on:
-  workflow_dispatch:
-  push:
-    paths:
-      - 'SAS4_Android_Tools_Project.zip'
-      - '.github/workflows/build-apk.yml'
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: '8.7'
-
-      - name: Extract project
-        run: unzip SAS4_Android_Tools_Project.zip -d project
-
       - name: Build APK
-        run: gradle -p project assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: SAS4-Demo-APK
-          path: project/app/build/outputs/apk/debug/*.apk
+        run: |
+          PROJECT_DIR=$(dirname "$(find project -name settings.gradle -o -name settings.gradle.kts | head -n 1)")
+          if [ "$PROJECT_DIR" = "." ] || [ -z "$PROJECT_DIR" ]; then
+            echo "File settings.gradle tidak ditemukan"
+            find project -maxdepth 4 -type f
+            exit 1
+          fi
+          echo "Project directory: $PROJECT_DIR"
+          gradle -p "$PROJECT_DIR" assembleDebug
